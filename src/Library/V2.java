@@ -17,7 +17,7 @@ public class V2 {
         return new V2(x + v.x, y + v.y);
     }
 
-    double skalarprodukt(V2 v) {
+    double dot(V2 v) {
         return (x*v.x+y*v.y);
     }
 
@@ -27,6 +27,10 @@ public class V2 {
 
     V2 sub(V2 v) {
         return new V2(x-v.x, y-v.y);
+    }
+
+    V2 div(double k) {
+        return new V2(x/k, y/k);
     }
 
     V2 crossVector(V2 v) {
@@ -39,6 +43,11 @@ public class V2 {
 
     double archV() {
         return (Math.acos(x));
+    }
+
+    V2 unit(){
+        double l=lengthV();
+        return new V2(x/l, y/l);
     }
 
 

@@ -12,6 +12,14 @@ public class M2 {
         this.d = d;
     }
 
+    M2 add(M2 m) {
+        return new M2(this.a+ m.a, this.b+ m.b, this.c+ m.c, this.d+ m.d);
+    }
+
+    M2 sub(M2 m){    // matrix subtraction
+        return new M2(this.a-m.a, this.b-m.b,
+                this.c-m.c, this.d-m.d);
+    }
     V2 vectorMulti(V2 v) {
         return new V2(a* v.x+b* v.y, c* v.x+d* v.y);
     }
@@ -23,6 +31,20 @@ public class M2 {
 
     M2 numberMulti(double x) {
         return new M2(a*x,b*x,c*x,d*x);
+    }
+
+    double determinant() {
+        return a*d-b*c;
+    }
+
+    M2 adj(){           // Adjungatet Matrix
+        return new M2( d,-b,
+                -c, a);
+    }
+
+    M2 inv(){           // Inverse
+        if (determinant()==0) throw new ArithmeticException("Matrix "+this+" has no inverse.");
+        return adj().numberMulti(1.0/determinant());
     }
 
     @Override
@@ -38,7 +60,7 @@ public class M2 {
     public static void main(String[] args) {
         M2 m1 = new M2(2,4,5,3);
         M2 m2 = new M2(3,6,-1,9);
-
+        M2 minv = m1.inv();
         M2 m3 = m1.matrixMulti(m2);
         System.out.println(m3.toString());
     }
