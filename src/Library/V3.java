@@ -36,7 +36,7 @@ public class V3 {
         return Math.sqrt(x*x + y*y + z*z);
     }
 
-    V3 unit(){
+    public V3 unit(){
         double l=length();
         return new V3(x/l, y/l, z/l);
     }

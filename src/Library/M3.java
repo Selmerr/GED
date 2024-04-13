@@ -1,5 +1,10 @@
 package Library;
 
+import java.lang.Math.*;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 public class M3 {
 
     double a11, a12, a13;
@@ -59,6 +64,13 @@ public class M3 {
                 a21* m.a11+a22*m.a21+a23* m.a31, a21* m.a12+a22* m.a22+a23* m.a32, a21* m.a13+a22* m.a23+a23* m.a33,
                 a31* m.a11+a32* m.a21+a33* m.a31, a31* m.a12+a32* m.a22+ a33* m.a32, a31* m.a13+a32* m.a23+a33* m.a33);
     }
+
+    //Måske jeg har misforstået noget, gemmer til senere
+//    M3 rotateX(double v) {
+//        return new M3(Math.cos(v), -Math.sin(v), 0,
+//                    Math.sin(v),Math.cos(v), 0,
+//                    0,0,1);
+//    }
     @Override
     public String toString() {
         return "M3{" +
@@ -75,27 +87,34 @@ public class M3 {
     }
 
     public static void main(String[] args) {
-        V3 v1 = new V3(1,2,3);
-        V3 v2 = new V3(4,5,6);
-        V3 v3 = new V3(7,8,9);
+        V3 v1 = new V3(1, 2, 3);
+        V3 v2 = new V3(4, 5, 6);
+        V3 v3 = new V3(7, 8, 9);
 
-        M3 m = new M3(v1,v2,v3);
-        M3 m2 = new M3(9,8,7,
-                        6,5,4,
-                        3,2,1);
+        M3 m = new M3(v1, v2, v3);
+        M3 m2 = new M3(9, 8, 7,
+                6, 5, 4,
+                3, 2, 1);
 
+        M3 I = new M3(1, 0, 0,
+                0, 1, 0,
+                0, 0, 1);
 
+        M3 S = new M3(0, -1, 0, 1, 0, 0, 0, 0, 0);
 
         System.out.println(m.a11 + "  " + m.a12 + "  " + m.a13);
         System.out.println(m.a21 + "  " + m.a22 + "  " + m.a23);
         System.out.println(m.a31 + "  " + m.a32 + "  " + m.a33);
         System.out.println(m.toString());
-        System.out.println("M1 + M2: "+m.add(m2).toString());
-        System.out.println("M1 - M2: "+m.sub(m2).toString());
-        System.out.println("M1*V1: "+m.mul(v1).toString());
-        System.out.println("M1*M2: "+m.mul(m2).toString());
-        System.out.println("M2*M1: "+m2.mul(m).toString());
+        System.out.println("M1 + M2: " + m.add(m2).toString());
+        System.out.println("M1 - M2: " + m.sub(m2).toString());
+        System.out.println("M1*V1: " + m.mul(v1).toString());
+        System.out.println("M1*M2: " + m.mul(m2).toString());
+        System.out.println("M2*M1: " + m2.mul(m).toString());
 
 
+        M3 R = I.add(S.mul(sin(0))).add(S.mul(S).mul(S).mul(1 - cos(0)));
+
+        System.out.println(R.toString());
     }
 }
