@@ -45,9 +45,14 @@ public class Camera {
     }
 
     void drawAxis(Graphics g) {
+        Color old = g.getColor();
+        g.setColor(Color.RED);
         drawLine(g, O, i);
+        g.setColor(Color.BLUE);
         drawLine(g, O, j);
+        g.setColor(Color.GREEN);
         drawLine(g, O, k);
+        g.setColor(old);
     }
 
     void drawPoint(Graphics g, V3 p) {

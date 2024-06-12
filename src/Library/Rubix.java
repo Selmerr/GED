@@ -2,10 +2,8 @@ package Library;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Rubix extends JFrame {
@@ -23,8 +21,6 @@ public class Rubix extends JFrame {
     }
 
     class DrawPanel extends JPanel {
-
-
         Timer timer = new Timer(10, new TimerListener());
 
         Camera S = new Camera(100, 100, 400, 400);
@@ -58,30 +54,60 @@ public class Rubix extends JFrame {
 
         V3 C = new V3(0,0,0);
         V3[] cube = new V3[8];
+        ArrayList<Cube> cubes = new ArrayList<>();
+
+        V3 tx = new V3(1.1,0,0);
+        V3 ty = new V3(0,1.1,0);
+        V3 tz = new V3(0,0,1.1);
 
 
         V3 t1 = new V3(7,7,7);
         V3 t2 = new V3(8,8,8);
+        V3 cameraPosition = new V3(10, 5, 2);
+        int prevX, prevY;
 
         DrawPanel() {
             timer.start();
             setFocusable(true);
             addKeyListener(new MyKeyListener());
-            cube[0]=new V3(1,4,1);
-            cube[1]=new V3(1,4,3);
-            cube[2]=new V3(1,6,1);
-            cube[3]=new V3(1,6,3);
-            cube[4]=new V3(3,4,1);
-            cube[5]=new V3(3,4,3);
-            cube[6]=new V3(3,6,1);
-            cube[7]=new V3(3,6,3);
+            addMouseWheelListener(new MyWheelListener());
+            addMouseMotionListener(new MyMotionListener());
+            cube[0]=new V3(1,1,1);
+            cube[1]=new V3(1,1,2);
+            cube[2]=new V3(2,1,1);
+            cube[3]=new V3(2,1,2);
+            cube[4]=new V3(1,2,1);
+            cube[5]=new V3(1,2,2);
+            cube[6]=new V3(2,2,1);
+            cube[7]=new V3(2,2,2);
+            Cube cube1 = new Cube(cube);
+            for (int l = 0; l<3; l++) {
+                for (int j = 0; j < 3; j++) {
+                    for (int k = 0; k < 3; k++) {
+                        V3[] temp = new V3[8];
+                        for (int i = 0; i < 8; i++) {
+                            temp[i] = cube[i].add(tz.mul(k)).add(tx.mul(j)).add(ty.mul(l));
+                        }
+                        cubes.add(new Cube(temp));
+                    }
+                }
+            }
+            cubes.add(cube1);
+//            cube[0]=new V3(1,4,1);
+//            cube[1]=new V3(1,4,3);
+//            cube[2]=new V3(1,6,1);
+//            cube[3]=new V3(1,6,3);
+//            cube[4]=new V3(3,4,1);
+//            cube[5]=new V3(3,4,3);
+//            cube[6]=new V3(3,6,1);
+//            cube[7]=new V3(3,6,3);
 
             for(V3 p : cube) {
                 C=C.add(p);
             }
             C = C.mul(1.0/ cube.length);
 
-            S.moveTo(new V3(10,5,2));
+            S.moveTo(cameraPosition);
             S.focus(C);
             S.z=6;
         }
@@ -90,18 +116,40 @@ public class Rubix extends JFrame {
             super.paintComponent(g);
             S.drawAxis(g);
             S.fillRect(g,cube[0],cube[1],Color.green);
-            S.drawLine(g,cube[0],cube[1]);
-            S.drawLine(g,cube[1],cube[3]);
-            S.drawLine(g,cube[3],cube[2]);
-            S.drawLine(g,cube[2],cube[0]);
-            S.drawLine(g,cube[4],cube[5]);
-            S.drawLine(g,cube[5],cube[7]);
-            S.drawLine(g,cube[7],cube[6]);
-            S.drawLine(g,cube[6],cube[4]);
-            S.drawLine(g,cube[0],cube[4]);
-            S.drawLine(g,cube[1],cube[5]);
-            S.drawLine(g,cube[3],cube[7]);
-            S.drawLine(g,cube[2],cube[6]);
+//            S.drawLine(g,cube[0],cube[1]);
+//            S.drawLine(g,cube[1],cube[3]);
+//            S.drawLine(g,cube[3],cube[2]);
+//            S.drawLine(g,cube[2],cube[0]);
+//            S.drawLine(g,cube[4],cube[5]);
+//            S.drawLine(g,cube[5],cube[7]);
+//            S.drawLine(g,cube[7],cube[6]);
+//            S.drawLine(g,cube[6],cube[4]);
+//            S.drawLine(g,cube[0],cube[4]);
+//            S.drawLine(g,cube[1],cube[5]);
+//            S.drawLine(g,cube[3],cube[7]);
+//            S.drawLine(g,cube[2],cube[6]);
+            for (Cube cube : cubes) {
+                S.drawLine(g,cube.points[0],cube.points[1]);
+                S.drawLine(g,cube.points[1],cube.points[3]);
+                S.drawLine(g,cube.points[3],cube.points[2]);
+                S.drawLine(g,cube.points[2],cube.points[0]);
+                S.drawLine(g,cube.points[4],cube.points[5]);
+                S.drawLine(g,cube.points[5],cube.points[7]);
+                S.drawLine(g,cube.points[7],cube.points[6]);
+                S.drawLine(g,cube.points[6],cube.points[4]);
+                S.drawLine(g,cube.points[0],cube.points[4]);
+                S.drawLine(g,cube.points[1],cube.points[5]);
+                S.drawLine(g,cube.points[3],cube.points[7]);
+                S.drawLine(g,cube.points[2],cube.points[6]);
+            }
+            for (Cube cube : cubes) {
+                for (int i = 0; i < 8; i++) {
+                    //                cube[i] = Rz.mul(cube[i].sub(C)).add(C);
+                    //                cube[i] = Ry.mul(cube[i].sub(C)).add(C);
+                    //                cube[i] = Rx.mul(cube[i].sub(C)).add(C);
+                    cube.points[i] = Ru.mul(cube.points[i].sub(cube.C)).add(cube.C);
+                }
+            }
 
         }
 
@@ -122,12 +170,7 @@ public class Rubix extends JFrame {
                 switch (e.getKeyCode()) {
                     case 37:
                         for(int i=0; i<8; i++) {
-//                cube[i] = Rz.mul(cube[i].sub(C)).add(C);
-//                cube[i] = Ry.mul(cube[i].sub(C)).add(C);
-//                cube[i] = Rx.mul(cube[i].sub(C)).add(C);
-                            cube[i] = Ru.mul(cube[i].sub(C)).add(C);
-
-
+                            cube[i] = Rx.mul(cube[i].sub(C)).add(C);
                         }
                 }
             }
@@ -137,6 +180,65 @@ public class Rubix extends JFrame {
             }
         }
 
+        class MyMouseListener implements MouseListener {
 
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                prevX = e.getX();
+                prevY = e.getY();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        }
+
+        class MyMotionListener implements MouseMotionListener {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+                // Move the camera to the new position
+                S.moveTo(cameraPosition);
+                S.focus(C);
+
+                repaint();
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+
+            }
+        }
+
+        class MyWheelListener implements MouseWheelListener {
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int notches = e.getWheelRotation();
+                if(notches<0) {
+                    S.z +=1;
+                }
+                else {
+                    S.z -=1;
+                }
+            }
+        }
     }
 }
