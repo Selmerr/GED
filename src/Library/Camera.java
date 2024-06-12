@@ -58,4 +58,8 @@ public class Camera {
         s2.drawLine(g,project(p1),project(p2));
     }
 
+    void fillRect(Graphics g, V3 p1, V3 p2, Color color) {
+        s2.fillRect(g,color,project(p1),project(p2));
+    }
+
 }

@@ -20,7 +20,7 @@ public class RotationCamera extends JFrame {
         }
 
         class DrawPanel extends JPanel {
-            Timer myTimer = new Timer(50, new TimerListener());
+            Timer myTimer = new Timer(10, new TimerListener());
             Camera S = new Camera(100,100,400,400);
             int count = 0;
 

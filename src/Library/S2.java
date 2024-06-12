@@ -26,7 +26,6 @@ public class S2 {
     }
 
     void drawLine(Graphics g, V2 p1, V2 p2) {
-
         V2 pp1 = transform(p1);
         V2 pp2 = transform(p2);
         g.drawLine((int) pp1.x, (int) pp1.y, (int) pp2.x, (int) pp2.y);
@@ -87,5 +86,13 @@ public class S2 {
         M2 R=new M2(Math.cos(phi), -Math.sin(phi),
                 Math.sin(phi), Math.cos(phi));
         T=T.matrixMulti(R);
+    }
+
+    public void fillRect(Graphics g, Color color, V2 p1, V2 p2) {
+        g.setColor(color);
+        V2 pp1 = transform(p1);
+        V2 pp2 = transform(p2);
+        g.fillRect((int) pp1.x, (int) pp1.y, (int) (pp2.x-pp1.x), (int) (pp1.y-pp2.y));
+        g.setColor(Color.black);
     }
 }
