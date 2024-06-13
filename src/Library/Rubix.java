@@ -100,8 +100,10 @@ public class Rubix extends JFrame {
             }
             for (Cube cube : cubes) {
                 center = center.add(cube.C);
+                System.out.println("Cube Y: "+cube.C.y);
             }
             center = center.mul((double) 1 /cubes.size());
+            System.out.println("Center Y: "+center.y);
             S.moveTo(cameraPosition);
             S.focus(center);
             S.z=6;
@@ -111,18 +113,6 @@ public class Rubix extends JFrame {
             super.paintComponent(g);
             S.drawAxis(g);
             S.fillRect(g,cube[0],cube[1],Color.green);
-//            S.drawLine(g,cube[0],cube[1]);
-//            S.drawLine(g,cube[1],cube[3]);
-//            S.drawLine(g,cube[3],cube[2]);
-//            S.drawLine(g,cube[2],cube[0]);
-//            S.drawLine(g,cube[4],cube[5]);
-//            S.drawLine(g,cube[5],cube[7]);
-//            S.drawLine(g,cube[7],cube[6]);
-//            S.drawLine(g,cube[6],cube[4]);
-//            S.drawLine(g,cube[0],cube[4]);
-//            S.drawLine(g,cube[1],cube[5]);
-//            S.drawLine(g,cube[3],cube[7]);
-//            S.drawLine(g,cube[2],cube[6]);
             for (Cube cube : cubes) {
                 S.drawLine(g,cube.points[0],cube.points[1]);
                 S.drawLine(g,cube.points[1],cube.points[3]);
@@ -137,15 +127,6 @@ public class Rubix extends JFrame {
                 S.drawLine(g,cube.points[3],cube.points[7]);
                 S.drawLine(g,cube.points[2],cube.points[6]);
             }
-//            for (Cube cube : cubes) {
-//                for (int i = 0; i < 8; i++) {
-//                    //                cube[i] = Rz.mul(cube[i].sub(C)).add(C);
-//                    //                cube[i] = Ry.mul(cube[i].sub(C)).add(C);
-//                    //                cube[i] = Rx.mul(cube[i].sub(C)).add(C);
-//                    cube.points[i] = Ru.mul(cube.points[i].sub(cube.C)).add(cube.C);
-//                }
-//            }
-
         }
 
 
@@ -165,6 +146,7 @@ public class Rubix extends JFrame {
                 int keyCode = e.getKeyCode();
                 if(keyCode == KeyEvent.VK_LEFT) {
                     double angle = -PI/10;
+                    angle = angle % (2 * Math.PI);
                     M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
                     for (Cube cube : selectedCubes) {
                         for (int i = 0; i < 8; i++) {
@@ -174,6 +156,7 @@ public class Rubix extends JFrame {
                 }
                 if(keyCode == KeyEvent.VK_RIGHT) {
                     double angle = PI/10;
+                    angle = angle % (2 * Math.PI);
                     M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
                     for (Cube cube : selectedCubes) {
                         for (int i = 0; i < 8; i++) {
@@ -183,6 +166,7 @@ public class Rubix extends JFrame {
                 }
                 if(keyCode == KeyEvent.VK_UP) {
                     double angle = -PI/10;
+                    angle = angle % (2 * Math.PI);
                     M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
                     for (Cube cube : selectedCubes) {
                         for (int i = 0; i < 8; i++) {
@@ -192,6 +176,7 @@ public class Rubix extends JFrame {
                 }
                 if(keyCode == KeyEvent.VK_DOWN) {
                     double angle = PI/10;
+                    angle = angle % (2 * Math.PI);
                     M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
                     for (Cube cube : selectedCubes) {
                         for (int i = 0; i < 8; i++) {
@@ -203,74 +188,92 @@ public class Rubix extends JFrame {
 
             public void keyReleased(KeyEvent e) {
                 int keyCode = e.getKeyCode();
-                if(keyCode == KeyEvent.VK_NUMPAD8) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.z>center.z) {
+                double tolerance = 1e-6; // Small tolerance for floating-point comparisons
+
+                if (keyCode == KeyEvent.VK_NUMPAD8) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.z > center.z + tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD8 - Selected cube z: " + cube.C.z + " center z: " + center.z); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD5) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.z==center.z) {
+                if (keyCode == KeyEvent.VK_NUMPAD5) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.z > center.z-tolerance && cube.C.z < center.z+tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD5 - Selected cube z: " + cube.C.z + " center z: " + center.z); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD2) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.z<center.z) {
+                if (keyCode == KeyEvent.VK_NUMPAD9) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.y > center.y-tolerance && cube.C.y < center.y+tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD5 - Selected cube z: " + cube.C.z + " center z: " + center.z); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD4) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.y<center.y) {
+                if (keyCode == KeyEvent.VK_NUMPAD2) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.z < center.z - tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD2 - Selected cube z: " + cube.C.z + " center z: " + center.z); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD1) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.y==center.y) {
+                if (keyCode == KeyEvent.VK_NUMPAD4) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.y < center.y - tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD4 - Selected cube y: " + cube.C.y + " center y: " + center.y); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD6) {
-                    for (Cube cube : cubes)  {
-                        if(cube.C.y>center.y) {
+                if (keyCode == KeyEvent.VK_NUMPAD1) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (Math.abs(cube.C.y - center.y) < tolerance) {
                             selectedCubes.add(cube);
-                        }
-                        else {
-                            selectedCubes.remove(cube);
+                            System.out.println("NUMPAD1 - Selected cube y: " + cube.C.y + " center y: " + center.y); // Debugging statement
                         }
                     }
                 }
-                if(keyCode == KeyEvent.VK_NUMPAD0) {
-                    for (Cube cube : cubes)  {
-                        if(!selectedCubes.contains(cube)) {
+                if (keyCode == KeyEvent.VK_NUMPAD6) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (cube.C.y > center.y + tolerance) {
                             selectedCubes.add(cube);
+                            System.out.println("NUMPAD6 - Selected cube y: " + cube.C.y + " center y: " + center.y); // Debugging statement
                         }
                     }
                 }
+                if (keyCode == KeyEvent.VK_NUMPAD0) {
+                    selectedCubes.clear();
+                    for (Cube cube : cubes) {
+                        cube.updateCenter();
+                        if (!selectedCubes.contains(cube)) {
+                            selectedCubes.add(cube);
+                            System.out.println("NUMPAD0 - Selected cube: " + cube); // Debugging statement
+                        }
+                    }
+                }
+                repaint();
             }
+
+
         }
 
         class MyMouseListener implements MouseListener {
@@ -306,10 +309,46 @@ public class Rubix extends JFrame {
 
             @Override
             public void mouseDragged(MouseEvent e) {
+                int currentX = e.getX();
+                int currentY = e.getY();
+
+                int deltaX = currentX - prevX;
+                int deltaY = currentY - prevY;
+
+                // Update the previous position
+                prevX = currentX;
+                prevY = currentY;
+
+
+                // Apply rotations to the camera position
+                if (deltaY < 0) {
+                    double angle = PI/100;
+                    angle = angle % (2 * Math.PI);
+                    M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
+                    cameraPosition = Ry.mul(cameraPosition);
+                }
+                if (deltaY > 0) {
+                    double angle = -PI/100;
+                    angle = angle % (2 * Math.PI);
+                    M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
+                    cameraPosition = Ry.mul(cameraPosition);
+                }
+                if (deltaX < 0) {
+                    double angle = PI/100;
+                    angle = angle % (2 * Math.PI);
+                    M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
+                    cameraPosition = Rz.mul(cameraPosition);
+                }
+                if (deltaX > 0) {
+                    double angle = -PI/100;
+                    angle = angle % (2 * Math.PI);
+                    M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
+                    cameraPosition = Rz.mul(cameraPosition);
+                }
 
                 // Move the camera to the new position
                 S.moveTo(cameraPosition);
-                S.focus(C);
+                S.focus(center);
 
                 repaint();
             }
