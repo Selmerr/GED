@@ -325,25 +325,25 @@ public class Rubix extends JFrame {
                     double angle = PI/100;
                     angle = angle % (2 * Math.PI);
                     M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
-                    cameraPosition = Ry.mul(cameraPosition);
+                    cameraPosition = Ry.mul(cameraPosition.sub(center)).add(center);
                 }
                 if (deltaY > 0) {
                     double angle = -PI/100;
                     angle = angle % (2 * Math.PI);
                     M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
-                    cameraPosition = Ry.mul(cameraPosition);
+                    cameraPosition = Ry.mul(cameraPosition.sub(center)).add(center);
                 }
                 if (deltaX < 0) {
                     double angle = PI/100;
                     angle = angle % (2 * Math.PI);
                     M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
-                    cameraPosition = Rz.mul(cameraPosition);
+                    cameraPosition = Rz.mul(cameraPosition.sub(center)).add(center);
                 }
                 if (deltaX > 0) {
                     double angle = -PI/100;
                     angle = angle % (2 * Math.PI);
                     M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
-                    cameraPosition = Rz.mul(cameraPosition);
+                    cameraPosition = Rz.mul(cameraPosition.sub(center)).add(center);
                 }
 
                 // Move the camera to the new position
