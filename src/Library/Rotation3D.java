@@ -6,7 +6,7 @@ import java.awt.*;
 public class Rotation3D extends JFrame{
 
     public static void main(String[] args) {
-        JFrame frame = new Rotation2D();
+        JFrame frame = new Rotation3D();
         frame.setSize(700, 700);
         frame.setTitle("Stjernen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

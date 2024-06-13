@@ -48,9 +48,9 @@ public class Camera {
         Color old = g.getColor();
         g.setColor(Color.RED);
         drawLine(g, O, i);
-        g.setColor(Color.BLUE);
-        drawLine(g, O, j);
         g.setColor(Color.GREEN);
+        drawLine(g, O, j);
+        g.setColor(Color.BLUE);
         drawLine(g, O, k);
         g.setColor(old);
     }

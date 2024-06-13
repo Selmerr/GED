@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import static java.lang.Math.*;
 
 public class Rubix extends JFrame {
 
@@ -45,7 +46,7 @@ public class Rubix extends JFrame {
         M3 Su = new M3(0,-u.z,u.y,
                 u.z,0,-u.x,
                 -u.y,u.x,0);
-        double phi = Math.PI/1000;
+        double phi = PI/1000;
 
         M3 Rz = I.add(Sz.mul(Math.sin(phi))).add(Sz.mul(Sz).mul(1 - Math.cos(phi)));
         M3 Ry = I.add(Sy.mul(Math.sin(phi))).add(Sy.mul(Sy).mul(1 - Math.cos(phi)));
@@ -56,6 +57,7 @@ public class Rubix extends JFrame {
         V3[] cube = new V3[8];
         ArrayList<Cube> cubes = new ArrayList<>();
 
+        ArrayList<Cube> selectedCubes = new ArrayList<>();
         V3 tx = new V3(1.1,0,0);
         V3 ty = new V3(0,1.1,0);
         V3 tz = new V3(0,0,1.1);
@@ -65,6 +67,10 @@ public class Rubix extends JFrame {
         V3 t2 = new V3(8,8,8);
         V3 cameraPosition = new V3(10, 5, 2);
         int prevX, prevY;
+
+        V3 row1Center, row3Center, col1Center, col3Center;
+
+        V3 center = new V3(0,0,0);
 
         DrawPanel() {
             timer.start();
@@ -92,23 +98,12 @@ public class Rubix extends JFrame {
                     }
                 }
             }
-            cubes.add(cube1);
-//            cube[0]=new V3(1,4,1);
-//            cube[1]=new V3(1,4,3);
-//            cube[2]=new V3(1,6,1);
-//            cube[3]=new V3(1,6,3);
-//            cube[4]=new V3(3,4,1);
-//            cube[5]=new V3(3,4,3);
-//            cube[6]=new V3(3,6,1);
-//            cube[7]=new V3(3,6,3);
-
-            for(V3 p : cube) {
-                C=C.add(p);
+            for (Cube cube : cubes) {
+                center = center.add(cube.C);
             }
-            C = C.mul(1.0/ cube.length);
-
+            center = center.mul((double) 1 /cubes.size());
             S.moveTo(cameraPosition);
-            S.focus(C);
+            S.focus(center);
             S.z=6;
         }
 
@@ -142,14 +137,14 @@ public class Rubix extends JFrame {
                 S.drawLine(g,cube.points[3],cube.points[7]);
                 S.drawLine(g,cube.points[2],cube.points[6]);
             }
-            for (Cube cube : cubes) {
-                for (int i = 0; i < 8; i++) {
-                    //                cube[i] = Rz.mul(cube[i].sub(C)).add(C);
-                    //                cube[i] = Ry.mul(cube[i].sub(C)).add(C);
-                    //                cube[i] = Rx.mul(cube[i].sub(C)).add(C);
-                    cube.points[i] = Ru.mul(cube.points[i].sub(cube.C)).add(cube.C);
-                }
-            }
+//            for (Cube cube : cubes) {
+//                for (int i = 0; i < 8; i++) {
+//                    //                cube[i] = Rz.mul(cube[i].sub(C)).add(C);
+//                    //                cube[i] = Ry.mul(cube[i].sub(C)).add(C);
+//                    //                cube[i] = Rx.mul(cube[i].sub(C)).add(C);
+//                    cube.points[i] = Ru.mul(cube.points[i].sub(cube.C)).add(cube.C);
+//                }
+//            }
 
         }
 
@@ -167,16 +162,114 @@ public class Rubix extends JFrame {
             }
 
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case 37:
-                        for(int i=0; i<8; i++) {
-                            cube[i] = Rx.mul(cube[i].sub(C)).add(C);
+                int keyCode = e.getKeyCode();
+                if(keyCode == KeyEvent.VK_LEFT) {
+                    double angle = -PI/10;
+                    M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
+                    for (Cube cube : selectedCubes) {
+                        for (int i = 0; i < 8; i++) {
+                            cube.points[i] = Rz.mul(cube.points[i].sub(center)).add(center);
                         }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_RIGHT) {
+                    double angle = PI/10;
+                    M3 Rz = I.add(Sz.mul(Math.sin(angle))).add(Sz.mul(Sz).mul(1 - Math.cos(angle)));
+                    for (Cube cube : selectedCubes) {
+                        for (int i = 0; i < 8; i++) {
+                            cube.points[i] = Rz.mul(cube.points[i].sub(center)).add(center);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_UP) {
+                    double angle = -PI/10;
+                    M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
+                    for (Cube cube : selectedCubes) {
+                        for (int i = 0; i < 8; i++) {
+                            cube.points[i] = Ry.mul(cube.points[i].sub(center)).add(center);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_DOWN) {
+                    double angle = PI/10;
+                    M3 Ry = I.add(Sy.mul(Math.sin(angle))).add(Sy.mul(Sy).mul(1 - Math.cos(angle)));
+                    for (Cube cube : selectedCubes) {
+                        for (int i = 0; i < 8; i++) {
+                            cube.points[i] = Ry.mul(cube.points[i].sub(center)).add(center);
+                        }
+                    }
                 }
             }
 
             public void keyReleased(KeyEvent e) {
-
+                int keyCode = e.getKeyCode();
+                if(keyCode == KeyEvent.VK_NUMPAD8) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.z>center.z) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD5) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.z==center.z) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD2) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.z<center.z) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD4) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.y<center.y) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD1) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.y==center.y) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD6) {
+                    for (Cube cube : cubes)  {
+                        if(cube.C.y>center.y) {
+                            selectedCubes.add(cube);
+                        }
+                        else {
+                            selectedCubes.remove(cube);
+                        }
+                    }
+                }
+                if(keyCode == KeyEvent.VK_NUMPAD0) {
+                    for (Cube cube : cubes)  {
+                        if(!selectedCubes.contains(cube)) {
+                            selectedCubes.add(cube);
+                        }
+                    }
+                }
             }
         }
 
